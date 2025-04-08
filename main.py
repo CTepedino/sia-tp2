@@ -4,11 +4,12 @@ import random
 import os
 from dataclasses import dataclass
 from copy import deepcopy
+import argparse
 
-# === CONFIG ===
+# === CONFIG POR DEFAULT ===
 NUM_TRIANGLES = 200
 POP_SIZE = 30
-NUM_GENERATIONS = 1000
+NUM_GENERATIONS = 100
 MUTATION_RATE = 0.1
 ELITE_COUNT = 1
 
@@ -71,25 +72,41 @@ def generate_population(width, height):
     return [Individual(width, height) for _ in range(POP_SIZE)]
 
 def evolve_population(pop, target_img):
-    # Evaluar fitness
     for ind in pop:
         ind.evaluate(target_img)
 
-    # Ordenar y seleccionar elite
     pop.sort(key=lambda x: x.fitness, reverse=True)
     new_pop = pop[:ELITE_COUNT]
 
-    # Reproducir el resto
     while len(new_pop) < POP_SIZE:
-        parent1, parent2 = random.choices(pop[:10], k=2)  # torneo simple entre top 10
+        parent1, parent2 = random.choices(pop[:10], k=2)
         child = parent1.crossover(parent2)
         child.mutate()
         new_pop.append(child)
 
     return new_pop
 
-# === MAIN LOOP ===
+# === CONFIG DESDE ARGPARSE ===
+def parse_args():
+    parser = argparse.ArgumentParser(description="Algoritmo genético para recrear una imagen con triángulos")
+    parser.add_argument("--num_triangles", type=int, default=2000, help="Cantidad de triángulos por individuo")
+    parser.add_argument("--pop_size", type=int, default=30, help="Tamaño de la población")
+    parser.add_argument("--num_generations", type=int, default=100, help="Cantidad de generaciones")
+    parser.add_argument("--mutation_rate", type=float, default=0.1, help="Tasa de mutación")
+    parser.add_argument("--elite_count", type=int, default=1, help="Cantidad de individuos elite que se conservan")
+    return parser.parse_args()
+
+# === MAIN ===
 def main():
+    args = parse_args()
+
+    global NUM_TRIANGLES, POP_SIZE, NUM_GENERATIONS, MUTATION_RATE, ELITE_COUNT
+    NUM_TRIANGLES = args.num_triangles
+    POP_SIZE = args.pop_size
+    NUM_GENERATIONS = args.num_generations
+    MUTATION_RATE = args.mutation_rate
+    ELITE_COUNT = args.elite_count
+
     target = Image.open("wancho.jpeg").convert("RGB")
     width, height = target.size
 
@@ -97,13 +114,8 @@ def main():
 
     for generation in range(NUM_GENERATIONS):
         population = evolve_population(population, target)
-
         best = population[0]
         print(f"Gen {generation:03d} | Fitness: {best.fitness:.2f}")
-
-        # if generation % 10 == 0:
-        #     best_img = best.draw()
-        #     best_img.save(f"out_gen{generation:03d}.png")
 
     best_img = population[0].draw()
     best_img.save("output_final.png")

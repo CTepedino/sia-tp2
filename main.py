@@ -9,7 +9,7 @@ import argparse
 # === CONFIG POR DEFAULT ===
 NUM_TRIANGLES = 200
 POP_SIZE = 30
-NUM_GENERATIONS = 100
+NUM_GENERATIONS = 500
 MUTATION_RATE = 0.1
 ELITE_COUNT = 1
 
@@ -20,8 +20,18 @@ class Triangle:
     color: list
 
     @staticmethod
-    def random(width, height):
-        vertices = [(random.randint(0, width), random.randint(0, height)) for _ in range(3)]
+    def random(width, height, max_size=50):
+        cx = random.randint(0, width)
+        cy = random.randint(0, height)
+
+        vertices = []
+        for _ in range(3):
+            dx = random.randint(-max_size, max_size)
+            dy = random.randint(-max_size, max_size)
+            x = min(max(cx + dx, 0), width)
+            y = min(max(cy + dy, 0), height)
+            vertices.append((x, y))
+
         color = [random.randint(0, 255) for _ in range(3)] + [random.randint(0, 128)]
         return Triangle(vertices, color)
 
@@ -38,7 +48,7 @@ class Individual:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.triangles = [Triangle.random(width, height) for _ in range(NUM_TRIANGLES)]
+        self.triangles = [Triangle.random(width, height, max_size=50) for _ in range(NUM_TRIANGLES)]
         self.fitness = None
 
     def draw(self):

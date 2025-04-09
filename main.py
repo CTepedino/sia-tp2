@@ -7,7 +7,9 @@ import argparse
 import matplotlib.pyplot as plt
 import os
 from datetime import datetime
+import time
 
+MAX_MSE = 65025.0
 # === TRIANGLE CLASS ===
 @dataclass
 class Triangle:
@@ -36,6 +38,7 @@ class Triangle:
             j = random.randint(0, 3)
             self.color[j] = random.randint(0, 255) if j < 3 else random.randint(0, 128)
 
+
 # === INDIVIDUAL CLASS ===
 class Individual:
     def __init__(self, width, height, num_triangles):
@@ -43,6 +46,7 @@ class Individual:
         self.height = height
         self.triangles = [Triangle.random(width, height) for _ in range(num_triangles)]
         self.fitness = None
+        self.mse = None
 
     def draw(self):
         base = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))
@@ -57,14 +61,44 @@ class Individual:
                 draw = ImageDraw.Draw(batch_overlay, 'RGBA')
         return base
 
+    def evaluate_mse_only(self, target_img):
+        generated = self.draw()
+        a = np.array(generated.convert("RGB")).astype(np.float32)
+        self.mse = np.mean((a - target_img) ** 2)
+
+        fitness = 1.0 - (self.mse / MAX_MSE)
+        self.fitness = round(fitness, 6)
+        return self.fitness
+
     def evaluate(self, target_img):
         generated = self.draw()
         a = np.array(generated.convert("RGB")).astype(np.float32)
-        b = np.array(target_img.convert("RGB")).astype(np.float32)
-        mse = np.mean((a - b) ** 2)
-        self.fitness = -mse
+
+        mse = np.mean((a - target_img) ** 2)
+
+        # Error absoluto por canal
+        diff = np.abs(a - target_img)  # shape: (H, W, 3)
+
+        # Sumar diferencia por píxel (total RGB)
+        pixel_error = np.sum(diff, axis=-1)  # shape: (H, W)
+
+        # Tolerancia máxima
+        k = 0.5  # cuanto más grande, más castiga las diferencias
+
+        # Cálculo de bonus exponencial
+        bonus_matrix = np.exp(-k * pixel_error) * 10.0
+
+        # Suma total del bonus
+        match_bonus = np.sum(bonus_matrix)
+
+
+        self.fitness = -mse + match_bonus
         return self.fitness
 
+evaluate_methods = {
+        "evaluate_mse_only": lambda ind, img: ind.evaluate_mse_only(img),
+        "evaluate": lambda ind, img: ind.evaluate(img),
+    }
 # === SELECCIÓN, CROSSOVER Y MUTACIÓN ===
 def select_parents(pop, method="elite"):
     if method == "elite":
@@ -103,8 +137,12 @@ def mutate_multigen(ind, rate=0.1):
 
 # === EVOLUCIÓN ===
 def evolve_population(pop, target_img, args):
+    target_img = np.array(target_img.convert("RGB")).astype(np.float32)
+    evaluate_fn = evaluate_methods[args.evaluate]
+
     for ind in pop:
-        ind.evaluate(target_img)
+        evaluate_fn(ind, target_img)
+
 
     pop.sort(key=lambda x: x.fitness, reverse=True)
     new_pop = pop[:args.elite_count]
@@ -131,8 +169,10 @@ def evolve_population(pop, target_img, args):
     return new_pop
 
 def evolve_population_young_bias(pop, target_img, args):
+    target_img = np.array(target_img.convert("RGB")).astype(np.float32)
+    evaluate_fn = evaluate_methods[args.evaluate]
     for ind in pop:
-        ind.evaluate(target_img)
+        evaluate_fn(ind, target_img)
     pop.sort(key=lambda x: x.fitness, reverse=True)
 
     new_pop = pop[:args.elite_count]
@@ -177,9 +217,11 @@ def parse_args():
     parser.add_argument("--crossover", type=str, default="one_point", choices=["one_point", "two_points", "uniform"])
     parser.add_argument("--mutation", type=str, default="simple", choices=["simple", "gene", "multigen"])
     parser.add_argument("--young_bias", action="store_true")
+    parser.add_argument("--evaluate", type=str, choices=["evaluate", "evaluate_mse_only"], default="evaluate_mse_only")
     return parser.parse_args()
 
 def main():
+    start = time.time()
     args = parse_args()
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     output_dir = os.path.join("results", f"result_{timestamp}")
@@ -191,12 +233,12 @@ def main():
 
     evolve_fn = evolve_population_young_bias if args.young_bias else evolve_population
     history = []
-
+    #target_img = np.array(target.convert("RGB")).astype(np.float32)
     for generation in range(args.num_generations):
         population = evolve_fn(population, target, args)
         best = population[0]
-        history.append(-best.fitness)
-        print(f"Gen {generation:03d} | Fitness: {best.fitness:.2f}")
+        history.append(best.mse)
+        print(f"Gen {generation:03d} | Fitness: {best.fitness:.6f}")
 
         if generation % 50 == 0:
             img = best.draw().convert("RGB")
@@ -213,6 +255,7 @@ def main():
     plt.grid()
     plt.savefig(os.path.join(output_dir, "evolucion_fitness.png"))
     print("Guardado gráfico como evolucion_fitness.png")
-
+    end = time.time()
+    print(f"Tiempo de ejecución: {end - start:.4f} segundos")
 if __name__ == "__main__":
     main()

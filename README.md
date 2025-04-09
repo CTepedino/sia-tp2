@@ -40,18 +40,19 @@ uv run main.py --image_path path/a/la/imagen.jpg
 
 ## Parámetros disponibles
 
-| Parámetro              | Descripción                                                                 |
-|------------------------|-----------------------------------------------------------------------------|
-| --image_path           | Ruta a la imagen que se desea aproximar (**obligatorio**)                   |
-| --num_triangles        | Cantidad de triángulos por individuo (por defecto: 200)                     |
-| --pop_size             | Tamaño de la población (por defecto: 30)                                    |
-| --num_generations      | Número de generaciones a simular (por defecto: 50)                          |
-| --mutation_rate        | Probabilidad de mutación por triángulo (por defecto: 0.1)                   |
-| --elite_count          | Cantidad de individuos élite que se conservan por generación (default: 1)   |
-| --selection            | Método de selección: elite, ruleta, torneo                                  |
-| --crossover            | Método de cruce: one_point, two_points, uniform                             |
-| --mutation             | Tipo de mutación: simple, gene, multigen                                    |
-| --young_bias           | Si se incluye, activa un sesgo hacia individuos jóvenes en la evolución     |
+| Parámetro         | Descripción                                                               |
+|-------------------|---------------------------------------------------------------------------|
+| --image_path      | Ruta a la imagen que se desea aproximar (**obligatorio**)                 |
+| --num_triangles   | Cantidad de triángulos por individuo (por defecto: 200)                   |
+| --pop_size        | Tamaño de la población (por defecto: 30)                                  |
+| --num_generations | Número de generaciones a simular (por defecto: 300)                       |
+| --mutation_rate   | Probabilidad de mutación por triángulo (por defecto: 0.1)                 |
+| --elite_count     | Cantidad de individuos élite que se conservan por generación (default: 1) |
+| --selection       | Método de selección: elite, ruleta, torneo                                |
+| --crossover       | Método de cruce: one_point, two_points, uniform                           |
+| --mutation        | Tipo de mutación: simple, gene, multigen                                  |
+| --young_bias      | Si se incluye, activa un sesgo hacia individuos jóvenes en la evolución   |
+| --evaluate        | Funcíón para determinar fitness: evaluate, evaluate_only_mse              |
 
 ---
 

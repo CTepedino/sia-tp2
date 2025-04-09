@@ -8,14 +8,6 @@ import matplotlib.pyplot as plt
 import os
 from datetime import datetime
 
-
-# === CONFIG POR DEFAULT ===
-NUM_TRIANGLES = 200
-POP_SIZE = 30
-NUM_GENERATIONS = 500
-MUTATION_RATE = 0.1
-ELITE_COUNT = 1
-
 # === TRIANGLE CLASS ===
 @dataclass
 class Triangle:
@@ -46,26 +38,23 @@ class Triangle:
 
 # === INDIVIDUAL CLASS ===
 class Individual:
-    def __init__(self, width, height):
+    def __init__(self, width, height, num_triangles):
         self.width = width
         self.height = height
-        self.triangles = [Triangle.random(width, height) for _ in range(NUM_TRIANGLES)]
+        self.triangles = [Triangle.random(width, height) for _ in range(num_triangles)]
         self.fitness = None
 
     def draw(self):
         base = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))
-
         batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(batch_overlay, 'RGBA')
 
         for i, triangle in enumerate(self.triangles):
             draw.polygon(triangle.vertices, fill=tuple(triangle.color))
-
             if (i + 1) % 20 == 0 or i == len(self.triangles) - 1:
                 base = Image.alpha_composite(base, batch_overlay)
                 batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
                 draw = ImageDraw.Draw(batch_overlay, 'RGBA')
-
         return base
 
     def evaluate(self, target_img):
@@ -76,13 +65,7 @@ class Individual:
         self.fitness = -mse
         return self.fitness
 
-    def crossover(self, other):
-        child = Individual(self.width, self.height)
-        split = random.randint(0, NUM_TRIANGLES)
-        child.triangles = deepcopy(self.triangles[:split] + other.triangles[split:])
-        return child
-
-# === FUNCIONES DE MEJORA ===
+# === SELECCIÓN, CROSSOVER Y MUTACIÓN ===
 def select_parents(pop, method="elite"):
     if method == "elite":
         return random.choices(pop[:10], k=2)
@@ -95,14 +78,14 @@ def select_parents(pop, method="elite"):
         k = 5
         return [max(random.sample(pop, k), key=lambda x: x.fitness) for _ in range(2)]
 
-def crossover_two_points(p1, p2):
-    i, j = sorted(random.sample(range(NUM_TRIANGLES), 2))
-    child = Individual(p1.width, p1.height)
+def crossover_two_points(p1, p2, num_triangles):
+    i, j = sorted(random.sample(range(num_triangles), 2))
+    child = Individual(p1.width, p1.height, num_triangles)
     child.triangles = deepcopy(p1.triangles[:i] + p2.triangles[i:j] + p1.triangles[j:])
     return child
 
-def crossover_uniform(p1, p2):
-    child = Individual(p1.width, p1.height)
+def crossover_uniform(p1, p2, num_triangles):
+    child = Individual(p1.width, p1.height, num_triangles)
     child.triangles = [
         deepcopy(random.choice([t1, t2]))
         for t1, t2 in zip(p1.triangles, p2.triangles)
@@ -110,7 +93,7 @@ def crossover_uniform(p1, p2):
     return child
 
 def mutate_gene(ind):
-    idx = random.randint(0, NUM_TRIANGLES - 1)
+    idx = random.randint(0, len(ind.triangles) - 1)
     ind.triangles[idx].mutate(ind.width, ind.height)
 
 def mutate_multigen(ind, rate=0.1):
@@ -124,20 +107,20 @@ def evolve_population(pop, target_img, args):
         ind.evaluate(target_img)
 
     pop.sort(key=lambda x: x.fitness, reverse=True)
-    new_pop = pop[:ELITE_COUNT]
+    new_pop = pop[:args.elite_count]
 
-    while len(new_pop) < POP_SIZE:
+    while len(new_pop) < args.pop_size:
         parent1, parent2 = select_parents(pop, method=args.selection)
 
         if args.crossover == "one_point":
-            child = parent1.crossover(parent2)
+            child = deepcopy(random.choice([parent1, parent2]))
         elif args.crossover == "two_points":
-            child = crossover_two_points(parent1, parent2)
+            child = crossover_two_points(parent1, parent2, args.num_triangles)
         elif args.crossover == "uniform":
-            child = crossover_uniform(parent1, parent2)
+            child = crossover_uniform(parent1, parent2, args.num_triangles)
 
         if args.mutation == "simple":
-            child.mutate()
+            mutate_gene(child)
         elif args.mutation == "gene":
             mutate_gene(child)
         elif args.mutation == "multigen":
@@ -152,23 +135,23 @@ def evolve_population_young_bias(pop, target_img, args):
         ind.evaluate(target_img)
     pop.sort(key=lambda x: x.fitness, reverse=True)
 
-    new_pop = pop[:ELITE_COUNT]
+    new_pop = pop[:args.elite_count]
 
-    while len(new_pop) < POP_SIZE:
+    while len(new_pop) < args.pop_size:
         if random.random() < 0.7:
             parent1, parent2 = select_parents(pop[:10], method=args.selection)
         else:
             parent1, parent2 = select_parents(pop, method=args.selection)
 
         if args.crossover == "one_point":
-            child = parent1.crossover(parent2)
+            child = deepcopy(random.choice([parent1, parent2]))
         elif args.crossover == "two_points":
-            child = crossover_two_points(parent1, parent2)
+            child = crossover_two_points(parent1, parent2, args.num_triangles)
         elif args.crossover == "uniform":
-            child = crossover_uniform(parent1, parent2)
+            child = crossover_uniform(parent1, parent2, args.num_triangles)
 
         if args.mutation == "simple":
-            child.mutate()
+            mutate_gene(child)
         elif args.mutation == "gene":
             mutate_gene(child)
         elif args.mutation == "multigen":
@@ -179,15 +162,15 @@ def evolve_population_young_bias(pop, target_img, args):
     return new_pop
 
 # === CONFIG Y MAIN ===
-def generate_population(width, height):
-    return [Individual(width, height) for _ in range(POP_SIZE)]
+def generate_population(width, height, num_triangles, pop_size):
+    return [Individual(width, height, num_triangles) for _ in range(pop_size)]
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_path", type=str, required=True, help="Ruta a la imagen a aproximar")
-    parser.add_argument("--num_triangles", type=int, default=2000)
+    parser.add_argument("--num_triangles", type=int, default=200)
     parser.add_argument("--pop_size", type=int, default=30)
-    parser.add_argument("--num_generations", type=int, default=500)
+    parser.add_argument("--num_generations", type=int, default=300)
     parser.add_argument("--mutation_rate", type=float, default=0.1)
     parser.add_argument("--elite_count", type=int, default=1)
     parser.add_argument("--selection", type=str, default="elite", choices=["elite", "ruleta", "torneo"])
@@ -204,12 +187,12 @@ def main():
 
     target = Image.open(args.image_path).convert("RGB")
     width, height = target.size
-    population = generate_population(width, height)
+    population = generate_population(width, height, args.num_triangles, args.pop_size)
 
     evolve_fn = evolve_population_young_bias if args.young_bias else evolve_population
     history = []
 
-    for generation in range(NUM_GENERATIONS):
+    for generation in range(args.num_generations):
         population = evolve_fn(population, target, args)
         best = population[0]
         history.append(-best.fitness)

@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from copy import deepcopy
 import argparse
 import matplotlib.pyplot as plt
+import os
+from datetime import datetime
+
 
 # === CONFIG POR DEFAULT ===
 NUM_TRIANGLES = 200
@@ -20,7 +23,7 @@ class Triangle:
     color: list
 
     @staticmethod
-    def random(width, height, max_size=50):
+    def random(width, height, max_size=10):
         cx = random.randint(0, width)
         cy = random.randint(0, height)
         vertices = []
@@ -58,7 +61,7 @@ class Individual:
         for i, triangle in enumerate(self.triangles):
             draw.polygon(triangle.vertices, fill=tuple(triangle.color))
 
-            if (i + 1) % 10 == 0 or i == len(self.triangles) - 1:
+            if (i + 1) % 20 == 0 or i == len(self.triangles) - 1:
                 base = Image.alpha_composite(base, batch_overlay)
                 batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
                 draw = ImageDraw.Draw(batch_overlay, 'RGBA')
@@ -182,9 +185,9 @@ def generate_population(width, height):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_path", type=str, required=True, help="Ruta a la imagen a aproximar")
-    parser.add_argument("--num_triangles", type=int, default=200)
+    parser.add_argument("--num_triangles", type=int, default=2000)
     parser.add_argument("--pop_size", type=int, default=30)
-    parser.add_argument("--num_generations", type=int, default=50)
+    parser.add_argument("--num_generations", type=int, default=500)
     parser.add_argument("--mutation_rate", type=float, default=0.1)
     parser.add_argument("--elite_count", type=int, default=1)
     parser.add_argument("--selection", type=str, default="elite", choices=["elite", "ruleta", "torneo"])
@@ -195,12 +198,9 @@ def parse_args():
 
 def main():
     args = parse_args()
-    global NUM_TRIANGLES, POP_SIZE, NUM_GENERATIONS, MUTATION_RATE, ELITE_COUNT
-    NUM_TRIANGLES = args.num_triangles
-    POP_SIZE = args.pop_size
-    NUM_GENERATIONS = args.num_generations
-    MUTATION_RATE = args.mutation_rate
-    ELITE_COUNT = args.elite_count
+    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    output_dir = os.path.join("results", f"result_{timestamp}")
+    os.makedirs(output_dir, exist_ok=True)
 
     target = Image.open(args.image_path).convert("RGB")
     width, height = target.size
@@ -215,12 +215,12 @@ def main():
         history.append(-best.fitness)
         print(f"Gen {generation:03d} | Fitness: {best.fitness:.2f}")
 
-        if generation % 5 == 0:
+        if generation % 50 == 0:
             img = best.draw().convert("RGB")
-            img.save(f"gen_{generation:03d}.png")
+            img.save(os.path.join(output_dir, f"gen_{generation:03d}.png"))
 
     best_img = population[0].draw().convert("RGB")
-    best_img.save("output_final.png")
+    best_img.save(os.path.join(output_dir, "output_final.png"))
     print("Mejor individuo guardado como output_final.png")
 
     plt.plot(history)
@@ -228,7 +228,7 @@ def main():
     plt.ylabel("Error (MSE)")
     plt.title("Evolución del Error")
     plt.grid()
-    plt.savefig("evolucion_fitness.png")
+    plt.savefig(os.path.join(output_dir, "evolucion_fitness.png"))
     print("Guardado gráfico como evolucion_fitness.png")
 
 if __name__ == "__main__":

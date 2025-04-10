@@ -44,15 +44,19 @@ class Individual:
         return Individual(self.width, self.height, self.triangle_count, self.fitness, self.triangles.copy())
 
     def draw(self):
-        canvas = Image.new("RGBA", (self.width, self.height), (255, 255, 255, 255))
-        overlay = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
-        draw_overlay = ImageDraw.Draw(overlay, "RGBA")
+        base = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))
+        batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(batch_overlay, 'RGBA')
 
-        for triangle in self.triangles:
-            draw_overlay.polygon(triangle.points(), fill=triangle.color)
+        for i, triangle in enumerate(self.triangles):
+            draw.polygon(triangle.points(), fill=tuple(triangle.color))
+            if (i + 1) % 20 == 0 or i == len(self.triangles) - 1:
+                base = Image.alpha_composite(base, batch_overlay)
+                batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+                draw = ImageDraw.Draw(batch_overlay, 'RGBA')
+        return base
 
-        canvas = Image.alpha_composite(canvas, overlay)
-        return canvas
+
 
     def get_fitness(self):
         if self.fitness_value is None:

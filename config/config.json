@@ -2,5 +2,8 @@
   "image": "../cuadro.png",
   "triangle_count": "200",
   "iterations": "2",
-  "image_save_interval": "1"
+  "image_save_interval": "1",
+  "mutation": "uniform",
+  "mutation_prob":0.05,
+  "genes_to_mutate":3
 }

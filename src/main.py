@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 import time
 from PIL import Image
-
+from mutations import multigen_mutation, gen_mutation
 from individual import IndividualFactory
 
 if __name__ == "__main__":
@@ -26,6 +26,8 @@ if __name__ == "__main__":
     factory = IndividualFactory(width, height, triangle_count, lambda x: 0)
 
     gen = factory.generation_0(iterations)
+    gen = [gen_mutation(ind, mutation_prob=0.05) for ind in gen]
+
     timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     output_dir = os.path.join("results", f"result_{timestamp}")
     os.makedirs(output_dir, exist_ok=True)
@@ -34,7 +36,7 @@ if __name__ == "__main__":
         print(f"Carpeta creada correctamente: {output_dir}")
     else:
         print(f"Error: no se pudo crear la carpeta {output_dir}")
-        
+
     for i, individual in enumerate(gen):
         if i % image_save_interval == 0:
             output_path = os.path.join(output_dir, f"canvas_{i}.png")

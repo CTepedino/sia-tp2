@@ -2,7 +2,7 @@ import random
 from typing import Callable
 from individual import Individual, Triangle
 
-def gene_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
+def gen_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
     mutated = individual.copy()
     if random.random() < mutation_prob:
         tri = random.choice(mutated.triangles)
@@ -48,6 +48,29 @@ def multigen_mutation(individual: Individual, mutation_prob=0.05, genes_to_mutat
                 color = list(tri.color)
                 color[attr - 6] = random.randint(0, 255)
                 tri.color = tuple(color)
+    return mutated
+
+
+def uniform_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
+    mutated = individual.copy()
+    for tri in mutated.triangles:
+        for idx, point in enumerate([tri.a, tri.b, tri.c]):
+            x, y = point
+            if random.random() < mutation_prob:
+                x = random.randint(0, mutated.width - 1)
+            if random.random() < mutation_prob:
+                y = random.randint(0, mutated.height - 1)
+            if idx == 0:
+                tri.a = (x, y)
+            elif idx == 1:
+                tri.b = (x, y)
+            else:
+                tri.c = (x, y)
+        color = list(tri.color)
+        for i in range(4):
+            if random.random() < mutation_prob:
+                color[i] = random.randint(0, 255)
+        tri.color = tuple(color)
     return mutated
 
 

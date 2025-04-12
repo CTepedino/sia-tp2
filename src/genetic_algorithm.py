@@ -36,7 +36,7 @@ def genetic_algorithm(
         for i in range(selected_parents_size):
             children[i] = mutation_method(children[i], mutation_probability)
 
-        generation = generation_method(selected_parents, children, selection_method)
+        generation = generation_method(generation, children, selection_method)
 
     return max(generation, key=lambda ind: ind.get_fitness())
 

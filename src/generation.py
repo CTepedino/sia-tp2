@@ -1,21 +1,21 @@
 from src.individual import Individual
 from typing import Callable
 
-def fill_all(parents: list[Individual], children: list[Individual], selection_method: Callable[[int, list[Individual]], list[Individual]]) -> list[Individual]:
-    n = len(parents)
-    combined = parents + children
+def fill_all(current_gen: list[Individual], children: list[Individual], selection_method: Callable[[int, list[Individual]], list[Individual]]) -> list[Individual]:
+    n = len(current_gen)
+    combined = current_gen + children
     return selection_method(n, combined)
 
-def fill_parent(parents: list[Individual], children: list[Individual], selection_method: Callable[[int, list[Individual]], list[Individual]]) -> list[Individual]:
-    n = len(parents)
+def fill_parent(current_gen: list[Individual], children: list[Individual], selection_method: Callable[[int, list[Individual]], list[Individual]]) -> list[Individual]:
+    n = len(current_gen)
     k = len(children)
 
     if k > n:
         return selection_method(n, children)
     else:
         remaining = n - k
-        selected_parents = selection_method(remaining, parents)
-        return children + selected_parents
+        selected_current_gen = selection_method(remaining, current_gen)
+        return children + selected_current_gen
 
 generation_methods = {
     "fill_all": fill_all,

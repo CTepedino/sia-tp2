@@ -38,7 +38,7 @@ def genetic_algorithm(
 
         generation = generation_method(selected_parents, children, selection_method)
 
-
+    return max(generation, key=lambda ind: ind.get_fitness())
 
 
 

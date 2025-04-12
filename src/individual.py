@@ -1,18 +1,16 @@
 import random
 from typing import Callable
 from PIL import Image, ImageDraw
-import numpy as np
 
-# --- GLOBAL TARGET IMAGE ---
-target_array = None  # Se debe setear antes de usar el fitness
-
-# --- TRIANGLE ---
 class Triangle:
     def __init__(self, a: tuple[int, int], b: tuple[int, int], c: tuple[int, int], color: tuple[int, int, int, int]):
         self.a = a
         self.b = b
         self.c = c
         self.color = color
+
+    def __eq__(self, other):
+        return self.a == other.a and self.b == other.b and self.c == other.c and self.color == other.color
 
     def points(self):
         return [self.a, self.b, self.c]
@@ -27,7 +25,6 @@ def random_triangle(width, height) -> Triangle:
     rgba = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
     return Triangle(a, b, c, rgba)
 
-# --- INDIVIDUAL ---
 class Individual:
     def __init__(self, width, height, triangle_count, fitness, triangles: [Triangle]):
         self.width = width
@@ -42,6 +39,9 @@ class Individual:
         for triangle in self.triangles:
             ind_string += f"{triangle}\n"
         return ind_string
+
+    def __eq__(self, other):
+        return self.triangles == other.triangles
 
     def copy(self):
         clone = Individual(self.width, self.height, self.triangle_count, self.fitness, self.triangles.copy())
@@ -67,7 +67,6 @@ class Individual:
         return self.fitness_value
 
 
-# --- FACTORY ---
 class IndividualFactory:
     def __init__(self, width: int, height: int, triangle_count: int, fitness: Callable[[Individual], float]):
         self.width = width

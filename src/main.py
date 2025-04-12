@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 import time
 from PIL import Image
-import mutations
+import mutation
 import matplotlib.pyplot as plt
 import numpy as np
 from individual import IndividualFactory
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     gen = factory.generation_0(iterations)
 
     mutation_name = config.get("mutation", "gen") + "_mutation"
-    mutation_func = getattr(mutations, mutation_name)
+    mutation_func = getattr(mutation, mutation_name)
     mutation_prob = config.get("mutation_prob", 0.01)
 
     # Crear carpeta de resultados

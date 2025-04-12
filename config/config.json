@@ -1,9 +1,9 @@
 {
   "image": "../cuadro.png",
   "triangle_count": "200",
-  "iterations": "2",
+  "iterations": "20",
   "image_save_interval": "1",
-  "mutation": "uniform",
+  "mutation": "multigen",
   "mutation_prob":0.05,
   "genes_to_mutate":3,
   "mutation_range":19

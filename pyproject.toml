@@ -9,4 +9,5 @@ dependencies = [
     "matplotlib>=3.10.1",
     "numpy>=2.2.4",
     "pillow>=11.1.0",
+    "scikit-image>=0.25.2",
 ]

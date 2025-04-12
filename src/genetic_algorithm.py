@@ -34,6 +34,7 @@ def cut_condition(run_time, generation_number, old_generation, new_generation):
     if "time" in cut_conditions:
         if run_time >= cut_conditions["time"]:
             return True
+
     if "generations" in cut_conditions:
         if generation_number >= cut_conditions["generations"]:
             return True

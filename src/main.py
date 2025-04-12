@@ -18,6 +18,8 @@ if __name__ == "__main__":
     iterations = int(config["iterations"])
     image_save_interval = int(config["image_save_interval"])
     mutation_range = config.get("mutation_range", 30)
+    if(mutation_range<0 or mutation_range > 100):
+        raise ValueError("mutation_range debe estar entre 0 y 100")
     compressed_name = f"{triangle_count}_triangles_{image_file_name}"
 
     image = Image.open(image_file_name).convert("RGBA")

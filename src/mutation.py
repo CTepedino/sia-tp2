@@ -1,6 +1,8 @@
 import random
-from typing import Callable
-from individual import Individual, Triangle
+from individual import Individual
+
+
+
 
 def gen_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
     mutated = individual.copy()
@@ -89,3 +91,11 @@ def uniform_mutation(individual: Individual, mutation_prob=0.01, mutation_range=
                 color[i] = min(max(0, color[i] + delta), 255)
         tri.color = tuple(color)
     return mutated
+
+
+mutation_methods = {
+    "gen_mutation": gen_mutation,
+    "multigen_mutation": multigen_mutation,
+    "uniform_mutation": uniform_mutation,
+    "complete_mutation": complete_mutation
+}

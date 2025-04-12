@@ -42,7 +42,7 @@ def cut_condition(run_time, generation_number, old_generation, new_generation):
     gen_max_fitness = max(new_generation, key=lambda ind: ind.get_fitness)
 
     if "acceptable_solution" in cut_conditions:
-        if gen_max_fitness >= "acceptable_solution":
+        if gen_max_fitness >= cut_conditions["acceptable_solution"]:
             return True
 
     if "unchanging_max_fitness" in cut_conditions:

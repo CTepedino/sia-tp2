@@ -1,4 +1,5 @@
 import random
+import time
 from typing import Callable
 
 from src.individual import IndividualFactory
@@ -70,7 +71,7 @@ def cut_condition(run_time, generation_number, old_generation, new_generation):
 
 
 def genetic_algorithm(
-        factory: IndividualFactory,
+    factory: IndividualFactory,
     selection_method: Callable,
     crossover_method: Callable,
     mutation_method: Callable,
@@ -82,6 +83,10 @@ def genetic_algorithm(
 ):
     generation = factory.generation_0(generation_size)
     old_generation = None
+    generation_number = 0
+
+    start_time = time.time()
+    run_time = 0
 
     while not cut_condition(run_time, generation_number, old_generation, generation):
         selected_parents = selection_method(selected_parents_size, generation)
@@ -105,6 +110,9 @@ def genetic_algorithm(
 
         old_generation = generation
         generation = generation_method(generation, children, selection_method)
+        generation_number += 1
+
+        run_time = time.time() - start_time
 
     return max(generation, key=lambda ind: ind.get_fitness())
 

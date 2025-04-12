@@ -8,6 +8,8 @@ import mutations
 import matplotlib.pyplot as plt
 import numpy as np
 from individual import IndividualFactory
+from skimage import data, img_as_float
+from skimage.metrics import structural_similarity as ssim
 
 if __name__ == "__main__":
     with open(sys.argv[1], "r") as f:
@@ -24,6 +26,50 @@ if __name__ == "__main__":
 
     image = Image.open(image_file_name).convert("RGBA")
     width, height = image.size
+
+    # def fitness_fn(individual):
+    #     target_image = image
+    #     # Aseguramos que ambas imágenes estén en el mismo modo y tamaño
+    #     generated_img = individual.draw().convert("RGB")
+    #     target_img = target_image.convert("RGB")
+    #
+    #     # Convertimos a numpy arrays para cálculos rápidos
+    #     generated_np = np.array(generated_img).astype(np.float32)
+    #     target_np = np.array(target_img).astype(np.float32)
+    #
+    #     # Calculamos el MSE (Error cuadrático medio)
+    #     mse = np.mean((generated_np - target_np) ** 2)
+    #
+    #     # El máximo MSE posible es cuando cada canal tiene el valor máximo de 255,
+    #     # por lo tanto (255^2) por 4 canales.
+    #     max_mse = 65025.0
+    #
+    #     # Calculamos fitness: entre 0 (muy malo) y 1 (perfecto)
+    #     fitness_value = 1.0 - (mse / max_mse)
+    #
+    #     # Lo limitamos entre 0 y 1
+    #     return max(0.0, min(fitness_value, 1.0))
+
+
+    def fitness_fn(individual):
+        target_image = image
+        # Aseguramos que ambas imágenes estén en el mismo modo y tamaño
+        generated_img = individual.draw().convert("RGB")
+        target_img = target_image.convert("RGB")
+
+
+        # Convertimos a numpy arrays como float entre 0 y 1
+        generated_np = img_as_float(np.array(generated_img))
+        target_np = img_as_float(np.array(target_img))
+
+
+        # Calculamos SSIM
+        ssim_value = ssim(generated_np, target_np, channel_axis=-1, data_range=1.0)
+
+        # Fitness entre 0 y 1 directamente
+        return max(0.0, min(ssim_value, 1.0))
+
+
 
     factory = IndividualFactory(width, height, triangle_count, fitness_fn)
     gen = factory.generation_0(iterations)

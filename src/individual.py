@@ -1,8 +1,12 @@
 import random
 from typing import Callable
-
 from PIL import Image, ImageDraw
+import numpy as np
 
+# --- GLOBAL TARGET IMAGE ---
+target_array = None  # Se debe setear antes de usar el fitness
+
+# --- TRIANGLE ---
 class Triangle:
     def __init__(self, a: tuple[int, int], b: tuple[int, int], c: tuple[int, int], color: tuple[int, int, int, int]):
         self.a = a
@@ -11,7 +15,7 @@ class Triangle:
         self.color = color
 
     def points(self):
-        return [self.a,self.b,self.c]
+        return [self.a, self.b, self.c]
 
     def __str__(self):
         return f"triangle: {self.a}, {self.b}, {self.c} - rgba: {self.color}"
@@ -20,11 +24,10 @@ def random_triangle(width, height) -> Triangle:
     a = (random.randint(0, width - 1), random.randint(0, height - 1))
     b = (random.randint(0, width - 1), random.randint(0, height - 1))
     c = (random.randint(0, width - 1), random.randint(0, height - 1))
-
     rgba = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-
     return Triangle(a, b, c, rgba)
 
+# --- INDIVIDUAL ---
 class Individual:
     def __init__(self, width, height, triangle_count, fitness, triangles: [Triangle]):
         self.width = width
@@ -56,16 +59,13 @@ class Individual:
                 draw = ImageDraw.Draw(batch_overlay, 'RGBA')
         return base
 
-
-
     def get_fitness(self):
         if self.fitness_value is None:
-            self.fitness_value = fitness(self)
+            self.fitness_value = self.fitness(self)
         return self.fitness_value
 
-def fitness(i: Individual):
-    return 0 #TODO
 
+# --- FACTORY ---
 class IndividualFactory:
     def __init__(self, width: int, height: int, triangle_count: int, fitness: Callable[[Individual], float]):
         self.width = width
@@ -78,11 +78,7 @@ class IndividualFactory:
 
     def generation_0(self, generation_size: int):
         generation = []
-        for i in range(generation_size):
-            triangles = []
-            for i in range(self.triangle_count):
-                triangles.append(random_triangle(self.width, self.height))
+        for _ in range(generation_size):
+            triangles = [random_triangle(self.width, self.height) for _ in range(self.triangle_count)]
             generation.append(self.create_individual(triangles))
         return generation
-
-

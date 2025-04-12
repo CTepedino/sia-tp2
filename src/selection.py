@@ -148,22 +148,31 @@ def boltzmann(k: int, individuals: [Individual]) -> [Individual]:
                 break
     return selected
 
+_deterministic_tournament_participants = 10
+def set_deterministic_tournament_participants(value):
+    global _deterministic_tournament_participants
+    _deterministic_tournament_participants = value
 
-
-def deterministic_tournament(k: int, individuals: [Individual], m = 10):
+def deterministic_tournament(k: int, individuals: [Individual]):
     selected = []
     for _ in range(k):
-        participants = random.choices(individuals, k=m)
+        participants = random.choices(individuals, k=_deterministic_tournament_participants)
         selected.append(max(participants, key=lambda i: i.get_fitness()))
 
     return selected
 
-def probabilistic_tournament(k: int, individuals: [Individual], threshold = 0.75):
+
+_threshold = 0.75
+def set_threshold(value):
+    global _threshold
+    _threshold = value
+
+def probabilistic_tournament(k: int, individuals: [Individual]):
     selected = []
     for _ in range(k):
         participants = random.choices(individuals, k=2)
         r = random.random()
-        if r < threshold:
+        if r < _threshold:
             selected.append(max(participants, key=lambda i: i.get_fitness()))
         else:
             selected.append(min(participants, key=lambda i: i.get_fitness()))

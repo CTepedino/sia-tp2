@@ -157,7 +157,7 @@ def deterministic_tournament(k: int, individuals: [Individual]):
     selected = []
     for _ in range(k):
         participants = random.choices(individuals, k=_deterministic_tournament_participants)
-        selected.append(max(participants, key=lambda i: i.get_fitness()))
+        selected.append(max(participants, key=lambda i: i.get_fitness()).copy())
 
     return selected
 
@@ -173,9 +173,9 @@ def probabilistic_tournament(k: int, individuals: [Individual]):
         participants = random.choices(individuals, k=2)
         r = random.random()
         if r < _threshold:
-            selected.append(max(participants, key=lambda i: i.get_fitness()))
+            selected.append(max(participants, key=lambda i: i.get_fitness()).copy())
         else:
-            selected.append(min(participants, key=lambda i: i.get_fitness()))
+            selected.append(min(participants, key=lambda i: i.get_fitness()).copy())
     return selected
 
 selection_methods = {

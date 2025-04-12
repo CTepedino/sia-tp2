@@ -44,7 +44,9 @@ class Individual:
         return ind_string
 
     def copy(self):
-        return Individual(self.width, self.height, self.triangle_count, self.fitness, self.triangles.copy())
+        clone = Individual(self.width, self.height, self.triangle_count, self.fitness, self.triangles.copy())
+        clone.fitness_value = self.fitness_value
+        return clone
 
     def draw(self):
         base = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))

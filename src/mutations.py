@@ -2,7 +2,7 @@ import random
 from typing import Callable
 from individual import Individual, Triangle
 
-def gen_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
+def gen_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
     mutated = individual.copy()
     if random.random() < mutation_prob:
         tri = random.choice(mutated.triangles)
@@ -10,8 +10,11 @@ def gen_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
         if attr < 6:
             point_idx = attr // 2
             coord_idx = attr % 2
-            new_val = random.randint(0, mutated.width - 1 if coord_idx == 0 else mutated.height - 1)
             point = list(tri.points()[point_idx])
+            old_val = point[coord_idx]
+            limit = mutated.width if coord_idx == 0 else mutated.height
+            delta = random.randint(-mutation_range, mutation_range)
+            new_val = min(max(0, old_val + delta), limit - 1)
             point[coord_idx] = new_val
             if point_idx == 0:
                 tri.a = tuple(point)
@@ -21,12 +24,16 @@ def gen_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
                 tri.c = tuple(point)
         else:
             color = list(tri.color)
-            color[attr - 6] = random.randint(0, 255)
+            idx = attr - 6
+            old_val = color[idx]
+            delta = random.randint(-mutation_range, mutation_range)
+            color[idx] = min(max(0, old_val + delta), 255)
             tri.color = tuple(color)
     return mutated
 
 
-def multigen_mutation(individual: Individual, mutation_prob=0.05, genes_to_mutate=3) -> Individual:
+
+def multigen_mutation(individual: Individual, mutation_prob=0.05, genes_to_mutate=3, mutation_range=30) -> Individual:
     mutated = individual.copy()
     for _ in range(genes_to_mutate):
         if random.random() < mutation_prob:
@@ -35,8 +42,11 @@ def multigen_mutation(individual: Individual, mutation_prob=0.05, genes_to_mutat
             if attr < 6:
                 point_idx = attr // 2
                 coord_idx = attr % 2
-                new_val = random.randint(0, mutated.width - 1 if coord_idx == 0 else mutated.height - 1)
                 point = list(tri.points()[point_idx])
+                old_val = point[coord_idx]
+                limit = mutated.width if coord_idx == 0 else mutated.height
+                delta = random.randint(-mutation_range, mutation_range)
+                new_val = min(max(0, old_val + delta), limit - 1)
                 point[coord_idx] = new_val
                 if point_idx == 0:
                     tri.a = tuple(point)
@@ -46,20 +56,26 @@ def multigen_mutation(individual: Individual, mutation_prob=0.05, genes_to_mutat
                     tri.c = tuple(point)
             else:
                 color = list(tri.color)
-                color[attr - 6] = random.randint(0, 255)
+                idx = attr - 6
+                old_val = color[idx]
+                delta = random.randint(-mutation_range, mutation_range)
+                color[idx] = min(max(0, old_val + delta), 255)
                 tri.color = tuple(color)
     return mutated
 
 
-def uniform_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
+
+def uniform_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
     mutated = individual.copy()
     for tri in mutated.triangles:
         for idx, point in enumerate([tri.a, tri.b, tri.c]):
             x, y = point
             if random.random() < mutation_prob:
-                x = random.randint(0, mutated.width - 1)
+                delta = random.randint(-mutation_range, mutation_range)
+                x = min(max(0, x + delta), mutated.width - 1)
             if random.random() < mutation_prob:
-                y = random.randint(0, mutated.height - 1)
+                delta = random.randint(-mutation_range, mutation_range)
+                y = min(max(0, y + delta), mutated.height - 1)
             if idx == 0:
                 tri.a = (x, y)
             elif idx == 1:
@@ -69,8 +85,7 @@ def uniform_mutation(individual: Individual, mutation_prob=0.01) -> Individual:
         color = list(tri.color)
         for i in range(4):
             if random.random() < mutation_prob:
-                color[i] = random.randint(0, 255)
+                delta = random.randint(-mutation_range, mutation_range)
+                color[i] = min(max(0, color[i] + delta), 255)
         tri.color = tuple(color)
     return mutated
-
-

@@ -17,34 +17,11 @@ if __name__ == "__main__":
     triangle_count = int(config["triangle_count"])
     iterations = int(config["iterations"])
     image_save_interval = int(config["image_save_interval"])
-
+    mutation_range = config.get("mutation_range", 30)
     compressed_name = f"{triangle_count}_triangles_{image_file_name}"
 
     image = Image.open(image_file_name).convert("RGBA")
     width, height = image.size
-
-    def fitness_fn(individual):
-        target_image = image
-        # Aseguramos que ambas imágenes estén en el mismo modo y tamaño
-        generated_img = individual.draw().convert("RGB")
-        target_img = target_image.convert("RGB").resize((individual.width, individual.height))
-
-        # Convertimos a numpy arrays para cálculos rápidos
-        generated_np = np.array(generated_img).astype(np.float32)
-        target_np = np.array(target_img).astype(np.float32)
-
-        # Calculamos el MSE (Error cuadrático medio)
-        mse = np.mean((generated_np - target_np) ** 2)
-
-        # El máximo MSE posible es cuando cada canal tiene el valor máximo de 255, 
-        # por lo tanto (255^2) por 4 canales.
-        max_mse = (255 ** 2) * 4  # 4 canales (RGBA)
-
-        # Calculamos fitness: entre 0 (muy malo) y 1 (perfecto)
-        fitness_value = 1.0 - (mse / max_mse)
-
-        # Lo limitamos entre 0 y 1
-        return max(0.0, min(fitness_value, 1.0))
 
     factory = IndividualFactory(width, height, triangle_count, fitness_fn)
     gen = factory.generation_0(iterations)
@@ -81,9 +58,9 @@ if __name__ == "__main__":
         # Mutar la siguiente generación
         if mutation_name == "multigen_mutation":
             genes_to_mutate = config.get("genes_to_mutate", 3)
-            gen = [mutation_func(ind, mutation_prob=mutation_prob, genes_to_mutate=genes_to_mutate) for ind in gen]
+            gen = [mutation_func(ind, mutation_prob=mutation_prob, genes_to_mutate=genes_to_mutate, mutation_range=mutation_range) for ind in gen]
         else:
-            gen = [mutation_func(ind, mutation_prob=mutation_prob) for ind in gen]
+            gen = [mutation_func(ind, mutation_prob=mutation_prob, mutation_range=mutation_range) for ind in gen]
 
     # Guardar mejor imagen final
     best_final = min(gen, key=lambda ind: ind.get_fitness())

@@ -92,6 +92,28 @@ def uniform_mutation(individual: Individual, mutation_prob=0.01, mutation_range=
         tri.color = tuple(color)
     return mutated
 
+def complete_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
+    mutated = individual.copy()
+    if random.random() < mutation_prob:
+        for tri in mutated.triangles:
+            for idx, point in enumerate([tri.a, tri.b, tri.c]):
+                x, y = point
+                delta = random.randint(-mutation_range, mutation_range)
+                x = min(max(0, x + delta), mutated.width - 1)
+                delta = random.randint(-mutation_range, mutation_range)
+                y = min(max(0, y + delta), mutated.height - 1)
+                if idx == 0:
+                    tri.a = (x, y)
+                elif idx == 1:
+                    tri.b = (x, y)
+                else:
+                    tri.c = (x, y)
+            color = list(tri.color)
+            for i in range(4):
+                delta = random.randint(-mutation_range, mutation_range)
+                color[i] = min(max(0, color[i] + delta), 255)
+            tri.color = tuple(color)
+    return mutated
 
 mutation_methods = {
     "gen_mutation": gen_mutation,

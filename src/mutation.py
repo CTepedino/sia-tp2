@@ -1,119 +1,84 @@
 import random
-from individual import Individual
+from individual import Individual, Triangle
+positional_mutation_range = 1000
+color_mutation_range = 255
+
+def set_positional_mutation_range(value):
+    global positional_mutation_range
+    positional_mutation_range = value
+
+def set_color_mutation_range(value):
+    global color_mutation_range
+    color_mutation_range = value
 
 
+def mutate_triangle(individual: Individual, triangle: Triangle):
+    a, b, c = triangle.points()
+    color = list(triangle.color)
 
-
-def gen_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
-    mutated = individual.copy()
-    if random.random() < mutation_prob:
-        tri = random.choice(mutated.triangles)
-        attr = random.randint(0, 9)
-        if attr < 6:
-            point_idx = attr // 2
-            coord_idx = attr % 2
-            point = list(tri.points()[point_idx])
-            old_val = point[coord_idx]
-            limit = mutated.width if coord_idx == 0 else mutated.height
-            delta = random.randint(-mutation_range, mutation_range)
-            new_val = min(max(0, old_val + delta), limit - 1)
-            point[coord_idx] = new_val
-            if point_idx == 0:
-                tri.a = tuple(point)
-            elif point_idx == 1:
-                tri.b = tuple(point)
-            else:
-                tri.c = tuple(point)
+    if random.random() < 0.5:
+        attr = random.randint(0, 6)
+        point_idx = attr // 2
+        coord_idx = attr % 2
+        point = list(triangle.points()[point_idx])
+        old_val = point[coord_idx]
+        limit = individual.width if coord_idx == 0 else individual.height
+        delta = random.randint(-positional_mutation_range, positional_mutation_range)
+        new_val = min(max(0, old_val + delta), limit - 1)
+        point[coord_idx] = new_val
+        if point_idx == 0:
+            a = tuple(point)
+        elif point_idx == 1:
+            b = tuple(point)
         else:
-            color = list(tri.color)
-            idx = attr - 6
-            old_val = color[idx]
-            delta = random.randint(-mutation_range, mutation_range)
-            color[idx] = min(max(0, old_val + delta), 255)
-            tri.color = tuple(color)
-    return mutated
+            c = tuple(point)
+    else:
+        idx = random.randint(0, 2)
+        old_val = color[idx]
+        delta = random.randint(-color_mutation_range, color_mutation_range)
+        color[idx] = min(max(0, old_val + delta), 255)
 
 
+    return Triangle(a, b, c, (color[0], color[1], color[2], color[3]))
 
-def multigen_mutation(individual: Individual, mutation_prob=0.05, genes_to_mutate=3, mutation_range=30) -> Individual:
-    mutated = individual.copy()
-    for _ in range(genes_to_mutate):
-        if random.random() < mutation_prob:
-            tri = random.choice(mutated.triangles)
-            attr = random.randint(0, 9)
-            if attr < 6:
-                point_idx = attr // 2
-                coord_idx = attr % 2
-                point = list(tri.points()[point_idx])
-                old_val = point[coord_idx]
-                limit = mutated.width if coord_idx == 0 else mutated.height
-                delta = random.randint(-mutation_range, mutation_range)
-                new_val = min(max(0, old_val + delta), limit - 1)
-                point[coord_idx] = new_val
-                if point_idx == 0:
-                    tri.a = tuple(point)
-                elif point_idx == 1:
-                    tri.b = tuple(point)
-                else:
-                    tri.c = tuple(point)
-            else:
-                color = list(tri.color)
-                idx = attr - 6
-                old_val = color[idx]
-                delta = random.randint(-mutation_range, mutation_range)
-                color[idx] = min(max(0, old_val + delta), 255)
-                tri.color = tuple(color)
-    return mutated
+def gen_mutation(individual: Individual, mutation_probability) -> [Triangle]:
+    mutated_triangles = individual.triangles.copy()
+
+    if random.random() < mutation_probability:
+        i = random.randint(0, individual.triangle_count -1)
+        mutated_triangles[i] = mutate_triangle(individual, individual.triangles[i])
+
+    return mutated_triangles
 
 
+def multigen_mutation(individual: Individual, mutation_probabilty) -> [Triangle]:
+    mutated_triangles = individual.triangles.copy()
 
-def uniform_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
-    mutated = individual.copy()
-    for tri in mutated.triangles:
-        for idx, point in enumerate([tri.a, tri.b, tri.c]):
-            x, y = point
-            if random.random() < mutation_prob:
-                delta = random.randint(-mutation_range, mutation_range)
-                x = min(max(0, x + delta), mutated.width - 1)
-            if random.random() < mutation_prob:
-                delta = random.randint(-mutation_range, mutation_range)
-                y = min(max(0, y + delta), mutated.height - 1)
-            if idx == 0:
-                tri.a = (x, y)
-            elif idx == 1:
-                tri.b = (x, y)
-            else:
-                tri.c = (x, y)
-        color = list(tri.color)
-        for i in range(4):
-            if random.random() < mutation_prob:
-                delta = random.randint(-mutation_range, mutation_range)
-                color[i] = min(max(0, color[i] + delta), 255)
-        tri.color = tuple(color)
-    return mutated
+    if random.random() < mutation_probabilty:
+        mutation_count = random.randint(1, individual.triangle_count)
+        to_mutate = random.sample(range(individual.triangle_count), mutation_count)
+        for i in to_mutate:
+            mutated_triangles[i] = mutate_triangle(individual, individual.triangles[i])
 
-def complete_mutation(individual: Individual, mutation_prob=0.01, mutation_range=30) -> Individual:
-    mutated = individual.copy()
-    if random.random() < mutation_prob:
-        for tri in mutated.triangles:
-            for idx, point in enumerate([tri.a, tri.b, tri.c]):
-                x, y = point
-                delta = random.randint(-mutation_range, mutation_range)
-                x = min(max(0, x + delta), mutated.width - 1)
-                delta = random.randint(-mutation_range, mutation_range)
-                y = min(max(0, y + delta), mutated.height - 1)
-                if idx == 0:
-                    tri.a = (x, y)
-                elif idx == 1:
-                    tri.b = (x, y)
-                else:
-                    tri.c = (x, y)
-            color = list(tri.color)
-            for i in range(4):
-                delta = random.randint(-mutation_range, mutation_range)
-                color[i] = min(max(0, color[i] + delta), 255)
-            tri.color = tuple(color)
-    return mutated
+    return mutated_triangles
+
+def uniform_mutation(individual: Individual, mutation_probability) -> [Triangle]:
+    mutated_triangles = individual.triangles.copy()
+
+    for i in range(individual.triangle_count):
+        if random.random() < mutation_probability:
+            mutated_triangles[i] = mutate_triangle(individual, individual.triangles[i])
+
+    return mutated_triangles
+
+def complete_mutation(individual: Individual, mutation_probability) -> [Triangle]:
+    mutated_triangles = individual.triangles.copy()
+
+    if random.random < mutation_probability:
+        for i in range(individual.triangle_count):
+            mutated_triangles[i] = mutate_triangle(individual, individual.triangles[i])
+
+    return mutated_triangles
 
 mutation_methods = {
     "gen_mutation": gen_mutation,

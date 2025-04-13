@@ -107,7 +107,7 @@ def genetic_algorithm(
                 children.append(selected_parents[i].copy())
 
         for i in range(selected_parents_size):
-            children[i] = mutation_method(children[i], mutation_probability)
+            children[i] = factory.create_individual(mutation_method(children[i], mutation_probability))
 
         old_generation = generation
         generation = generation_method(generation, children, selection_method)

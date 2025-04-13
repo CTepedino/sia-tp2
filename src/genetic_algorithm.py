@@ -2,7 +2,7 @@ import random
 import time
 from typing import Callable
 
-from src.individual import IndividualFactory
+from individual import IndividualFactory
 
 cut_conditions = {}
 
@@ -39,10 +39,10 @@ def cut_condition(run_time, generation_number, old_generation, new_generation):
         if generation_number >= cut_conditions["generations"]:
             return True
 
-    gen_max_fitness = max(new_generation, key=lambda ind: ind.get_fitness)
+    gen_max_fitness = max(new_generation, key=lambda ind: ind.get_fitness())
 
     if "acceptable_solution" in cut_conditions:
-        if gen_max_fitness >= cut_conditions["acceptable_solution"]:
+        if gen_max_fitness.get_fitness() >= cut_conditions["acceptable_solution"]:
             return True
 
     if "unchanging_max_fitness" in cut_conditions:
@@ -112,6 +112,10 @@ def genetic_algorithm(
         old_generation = generation
         generation = generation_method(generation, children, selection_method)
         generation_number += 1
+
+        # # Print the best individual and their fitness in the current generation
+        # best_individual = max(generation, key=lambda ind: ind.get_fitness())
+        # print(f"Generation {generation_number}: Best Individual Fitness = {best_individual.get_fitness()}")
 
         run_time = time.time() - start_time
 

@@ -1,7 +1,7 @@
 import math
 import random
 
-from src.individual import Individual, Triangle
+from individual import Individual, Triangle
 
 
 def single_point(i1: Individual, i2: Individual) -> [Triangle]:

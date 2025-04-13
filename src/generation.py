@@ -1,4 +1,4 @@
-from src.individual import Individual
+from individual import Individual
 from typing import Callable
 
 def fill_all(current_gen: list[Individual], children: list[Individual], selection_method: Callable[[int, list[Individual]], list[Individual]]) -> list[Individual]:

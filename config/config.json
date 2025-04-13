@@ -1,10 +1,16 @@
 {
-  "image": "../cuadro.png",
+  "image": "../argentina-flag.png",
   "triangle_count": "200",
-  "iterations": "20",
-  "image_save_interval": "1",
-  "mutation": "multigen",
-  "mutation_prob":0.05,
-  "genes_to_mutate":3,
+  "selection_method": "elite",
+  "crossover_method": "ring",
+  "mutation": "complete_mutation",
+  "generation_method": "fill_all",
+  "cut_condition": "generations",
+  "generations": 25,
+  "generation_size": 100,
+  "selected_parents_size": 75,
+  "crossover_probability": 0.75,
+  "mutation_prob": 0.25,
+  "genes_to_mutate": 3,
   "mutation_range":19
 }

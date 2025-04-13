@@ -2,12 +2,14 @@ import json
 import sys
 import os
 from datetime import datetime
-import time
 from PIL import Image
-import mutation
-import matplotlib.pyplot as plt
 import numpy as np
 from individual import IndividualFactory
+from mutation import mutation_methods
+from crossover import crossover_methods
+from selection import selection_methods
+from generation import generation_methods
+from genetic_algorithm import genetic_algorithm, set_time_cut_condition, set_generations_cut_condition, set_acceptable_solution_cut_condition, set_unchanging_individuals_cut_condition, set_unchanging_max_fitness_cut_condition
 from skimage import data, img_as_float
 from skimage.metrics import structural_similarity as ssim
 
@@ -16,40 +18,8 @@ if __name__ == "__main__":
         config = json.load(f)
 
     image_file_name = config["image"]
-    triangle_count = int(config["triangle_count"])
-    iterations = int(config["iterations"])
-    image_save_interval = int(config["image_save_interval"])
-    mutation_range = config.get("mutation_range", 30)
-    if(mutation_range<0 or mutation_range > 100):
-        raise ValueError("mutation_range debe estar entre 0 y 100")
-    compressed_name = f"{triangle_count}_triangles_{image_file_name}"
-
     image = Image.open(image_file_name).convert("RGBA")
     width, height = image.size
-
-    # def fitness_fn(individual):
-    #     target_image = image
-    #     # Aseguramos que ambas imágenes estén en el mismo modo y tamaño
-    #     generated_img = individual.draw().convert("RGB")
-    #     target_img = target_image.convert("RGB")
-    #
-    #     # Convertimos a numpy arrays para cálculos rápidos
-    #     generated_np = np.array(generated_img).astype(np.float32)
-    #     target_np = np.array(target_img).astype(np.float32)
-    #
-    #     # Calculamos el MSE (Error cuadrático medio)
-    #     mse = np.mean((generated_np - target_np) ** 2)
-    #
-    #     # El máximo MSE posible es cuando cada canal tiene el valor máximo de 255,
-    #     # por lo tanto (255^2) por 4 canales.
-    #     max_mse = 65025.0
-    #
-    #     # Calculamos fitness: entre 0 (muy malo) y 1 (perfecto)
-    #     fitness_value = 1.0 - (mse / max_mse)
-    #
-    #     # Lo limitamos entre 0 y 1
-    #     return max(0.0, min(fitness_value, 1.0))
-
 
     def fitness_fn(individual):
         target_image = image
@@ -69,57 +39,41 @@ if __name__ == "__main__":
         # Fitness entre 0 y 1 directamente
         return max(0.0, min(ssim_value, 1.0))
 
+    factory = IndividualFactory(
+        width=width,
+        height=height,
+        triangle_count=int(config["triangle_count"]),
+        fitness=fitness_fn
+    )
+
+    cut_condition = config["cut_condition"]
+    if cut_condition == "time":
+        set_time_cut_condition(config["time"])
+    elif cut_condition == "generations":
+        set_generations_cut_condition(config["generations"])
+    elif cut_condition == "acceptable_solution":
+        set_acceptable_solution_cut_condition(config["acceptable_solution"])
+    elif cut_condition == "unchanging_individuals":
+        set_unchanging_individuals_cut_condition(config["unchanging_individuals_threshold"], config["unchanging_individuals_generations"])
+    elif cut_condition == "unchanging_max_fitness":
+        set_unchanging_max_fitness_cut_condition(config["unchanging_max_fitness_generations"])
+
+    best_individual = genetic_algorithm(
+        factory=factory,
+        selection_method=selection_methods[config["selection_method"]],
+        crossover_method=crossover_methods[config["crossover_method"]],
+        mutation_method=mutation_methods[config["mutation"]],
+        generation_method=generation_methods[config["generation_method"]],
+        generation_size=config["generation_size"],
+        selected_parents_size=config["selected_parents_size"],
+        crossover_probability=config["crossover_probability"],
+        mutation_probability=config["mutation_prob"]
+    )
+
+    output_image = best_individual.draw()
+    output_path = os.path.join(os.path.dirname(image_file_name), "output.png")
+    output_image.save(output_path)
+    print(f"Best individual saved to {output_path}")
+    print(f"Fitness = {best_individual.get_fitness()}")
 
 
-    factory = IndividualFactory(width, height, triangle_count, fitness_fn)
-    gen = factory.generation_0(iterations)
-
-    mutation_name = config.get("mutation", "gen") + "_mutation"
-    mutation_func = getattr(mutation, mutation_name)
-    mutation_prob = config.get("mutation_prob", 0.01)
-
-    # Crear carpeta de resultados
-    timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    output_dir = os.path.join("results", f"result_{timestamp}")
-    os.makedirs(output_dir, exist_ok=True)
-
-    if os.path.exists(output_dir):
-        print(f"Carpeta creada correctamente: {output_dir}")
-    else:
-        print(f"Error: no se pudo crear la carpeta {output_dir}")
-
-    history = []
-
-    # Evolución de generaciones
-    for gen_index in range(iterations):
-        # Evaluar fitness y ordenar
-        gen.sort(key=lambda ind: ind.get_fitness())
-        best = gen[0]
-        history.append(best.get_fitness())
-        print(f"Generación {gen_index:03d} | Fitness: {best.get_fitness():.6f}")
-
-        # Guardar imagen del mejor cada cierto intervalo
-        if gen_index % image_save_interval == 0:
-            output_path = os.path.join(output_dir, f"gen_{gen_index:03d}.png")
-            best.draw().save(output_path)
-
-        # Mutar la siguiente generación
-        if mutation_name == "multigen_mutation":
-            genes_to_mutate = config.get("genes_to_mutate", 3)
-            gen = [mutation_func(ind, mutation_prob=mutation_prob, genes_to_mutate=genes_to_mutate, mutation_range=mutation_range) for ind in gen]
-        else:
-            gen = [mutation_func(ind, mutation_prob=mutation_prob, mutation_range=mutation_range) for ind in gen]
-
-    # Guardar mejor imagen final
-    best_final = min(gen, key=lambda ind: ind.get_fitness())
-    best_final.draw().save(os.path.join(output_dir, "output_final.png"))
-    print("Mejor individuo guardado como output_final.png")
-
-    # Guardar gráfico de evolución
-    plt.plot(history)
-    plt.xlabel("Generación")
-    plt.ylabel("Fitness")
-    plt.title("Evolución del Fitness")
-    plt.grid()
-    plt.savefig(os.path.join(output_dir, "evolucion_fitness.png"))
-    print("Guardado gráfico como evolucion_fitness.png")

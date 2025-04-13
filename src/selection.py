@@ -1,7 +1,7 @@
 import math
 import random
 
-from src.individual import Individual
+from individual import Individual
 
 def elite(k: int, individuals: [Individual]) -> [Individual]:
     individuals.sort(key=lambda i: i.get_fitness(), reverse=True)

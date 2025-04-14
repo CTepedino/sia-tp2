@@ -11,7 +11,7 @@ from genetic_algorithm import set_time_cut_condition, set_generations_cut_condit
     set_unchanging_max_fitness_cut_condition, genetic_algorithm
 from individual import IndividualFactory
 from fitness import get_fitness_fn
-from mutation import mutation_methods
+from mutation import mutation_methods, set_positional_mutation_range, set_color_mutation_range
 from selection import selection_methods, set_initial_temperature, set_min_temperature, \
     set_deterministic_tournament_participants, set_probabilistic_tournament_threshold
 
@@ -19,6 +19,7 @@ if __name__ == "__main__":
     with open(sys.argv[1], "r") as f:
         config = json.load(f)
 
+    print("Welcome!")
     image_file_name = config["image"]
     image = Image.open(image_file_name).convert("RGB")
     width, height = image.size
@@ -70,7 +71,6 @@ if __name__ == "__main__":
     output_image = best_individual.draw()
     output_path = os.path.join(os.path.dirname(image_file_name), "output.png")
     output_image.save(output_path)
-    print(f"Best individual saved to {output_path}")
     print(f"Fitness = {best_individual.get_fitness()}")
 
 

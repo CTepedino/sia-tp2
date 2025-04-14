@@ -1,22 +1,17 @@
 import random
 from typing import Callable
 from PIL import Image, ImageDraw
+from dataclasses import dataclass
 
+@dataclass(frozen=True)
 class Triangle:
-    def __init__(self, a: tuple[int, int], b: tuple[int, int], c: tuple[int, int], color: tuple[int, int, int, int]):
-        self.a = a
-        self.b = b
-        self.c = c
-        self.color = color
-
-    def __eq__(self, other):
-        return self.a == other.a and self.b == other.b and self.c == other.c and self.color == other.color
+    a: tuple[int, int]
+    b: tuple[int, int]
+    c: tuple[int, int]
+    color: tuple[int, int, int, int]
 
     def points(self):
         return [self.a, self.b, self.c]
-
-    def __str__(self):
-        return f"triangle: {self.a}, {self.b}, {self.c} - rgba: {self.color}"
 
 def random_triangle(width, height) -> Triangle:
     a = (random.randint(0, width - 1), random.randint(0, height - 1))
@@ -33,6 +28,7 @@ class Individual:
         self.triangles = triangles
         self.fitness = fitness
         self.fitness_value = None
+        self.cached_img = None
 
     def __str__(self):
         ind_string = ""
@@ -43,12 +39,18 @@ class Individual:
     def __eq__(self, other):
         return self.triangles == other.triangles
 
+    def __hash__(self):
+        return hash(tuple(self.triangles))
+
     def copy(self):
         clone = Individual(self.width, self.height, self.triangle_count, self.fitness, self.triangles.copy())
         clone.fitness_value = self.fitness_value
+        clone.cached_img = self.cached_img
         return clone
 
     def draw(self):
+        if self.cached_img is not None:
+            return self.cached_img
         base = Image.new('RGBA', (self.width, self.height), (255, 255, 255, 255))
         batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(batch_overlay, 'RGBA')
@@ -59,6 +61,8 @@ class Individual:
                 base = Image.alpha_composite(base, batch_overlay)
                 batch_overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
                 draw = ImageDraw.Draw(batch_overlay, 'RGBA')
+
+        self.cached_img = base
         return base
 
     def get_fitness(self):

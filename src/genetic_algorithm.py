@@ -3,6 +3,7 @@ import time
 from typing import Callable
 
 from individual import IndividualFactory
+from concurrent.futures import ThreadPoolExecutor
 
 cut_conditions = {}
 
@@ -70,6 +71,10 @@ def cut_condition(run_time, generation_number, old_generation, new_generation):
 
     return False
 
+def parallel_fitness_evaluation(generation):
+    with ThreadPoolExecutor() as executor:
+        list(executor.map(lambda ind: ind.get_fitness(), generation))
+
 
 def genetic_algorithm(
     factory: IndividualFactory,
@@ -90,6 +95,9 @@ def genetic_algorithm(
     run_time = 0
 
     while not cut_condition(run_time, generation_number, old_generation, generation):
+
+        parallel_fitness_evaluation(generation)
+
         selected_parents = selection_method(selected_parents_size, generation)
         random.shuffle(selected_parents)
 
@@ -119,8 +127,6 @@ def genetic_algorithm(
         run_time = time.time() - start_time
 
     return max(generation, key=lambda ind: ind.get_fitness())
-
-
 
 
 

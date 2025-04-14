@@ -1,7 +1,7 @@
 {
   "image": "Flag_of_Argentina.png",
   "triangle_count": "200",
-  "selection_method": "roulette",
+  "selection_method": "probabilistic_tournament",
   "crossover_method": "ring",
   "mutation_method": "uniform_mutation",
   "generation_method": "fill_all",
@@ -11,5 +11,6 @@
   "generation_size": 250,
   "selected_parents_size": 125,
   "crossover_probability": 0.9,
-  "mutation_probability": 0.2
+  "mutation_probability": 0.2,
+  "probabilistic_tournament_threshold"
 }

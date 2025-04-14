@@ -11,5 +11,5 @@ def get_fitness_fn(image: Image):
         generated_np = img_as_float(np.array(generated_image))
         target_np = img_as_float(np.array(image))
 
-        return ssim(generated_np, target_np, channel_axis=-1)
+        return ssim(generated_np, target_np, channel_axis=-1, data_range=1.0)
     return fitness

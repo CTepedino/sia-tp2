@@ -29,12 +29,12 @@ if __name__ == "__main__":
     if "generations" in cut_conditions:
         set_generations_cut_condition(int(cut_conditions["generations"]))
     if "acceptable_solution" in cut_conditions:
-        set_acceptable_solution_cut_condition(float(config["acceptable_solution"]))
+        set_acceptable_solution_cut_condition(float(cut_conditions["acceptable_solution"]))
     if "unchanging_individuals" in cut_conditions:
-        set_unchanging_individuals_cut_condition(float(config["unchanging_individuals"]["threshold"]),
-                                                 int(config["unchanging_individuals"]["generations"]))
+        set_unchanging_individuals_cut_condition(float(cut_conditions["unchanging_individuals"]["threshold"]),
+                                                 int(cut_conditions["unchanging_individuals"]["generations"]))
     if "unchanging_max_fitness" in cut_conditions:
-        set_unchanging_max_fitness_cut_condition(int(config["unchanging_max_fitness"]))
+        set_unchanging_max_fitness_cut_condition(int(cut_conditions["unchanging_max_fitness"]))
 
     if "boltzmann_initial_temperature" in config:
         set_initial_temperature(float(config["boltzmann_initial_temperature"]))

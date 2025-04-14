@@ -51,12 +51,10 @@ def universal(k: int, individuals: [Individual]) -> [Individual]:
     r_j = r/k
 
     selected = []
-    start = 0
     for _ in range(k):
-        for i, accum in enumerate(accumulated_fitness, start):
+        for i, accum in enumerate(accumulated_fitness):
             if r <= accum:
                 selected.append(individuals[i].copy())
-                start = i
                 break
         r_j += 1/k
 

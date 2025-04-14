@@ -1,13 +1,13 @@
 # Aproximación de Imágenes mediante Algoritmos Genéticos con Triángulos
 
-Este trabajo práctico implementa un algoritmo genético para aproximar imágenes utilizando composiciones de triángulos translúcidos. A lo largo de generaciones, los individuos evolucionan para representar visualmente una imagen objetivo, aplicando técnicas de selección, cruce y mutación.
+Este trabajo práctico implementa un algoritmo genético para aproximar imágenes utilizando composiciones de triángulos. A lo largo de generaciones, los individuos evolucionan para representar visualmente una imagen objetivo, aplicando técnicas de selección, cruce y mutación.
 
 ---
 
 ## Requisitos
 
 - Python 3.8 o superior
-- uv: gestor de entornos y dependencias ultra rápido (reemplazo de pip/venv)
+- uv: gestor de entornos y dependencias
 
 ### Instalación de uv:
 
@@ -33,62 +33,71 @@ Esto crea el entorno virtual en .venv e instala automáticamente las dependencia
 El programa se ejecuta desde consola utilizando uv run:
 
 ```bash
-uv run main.py --image_path path/a/la/imagen.jpg
+uv run main.py config_file_path
 ```
 
 ---
 
-## Parámetros disponibles
+## Archivo de configuración
 
-| Parámetro         | Descripción                                                               |
-|-------------------|---------------------------------------------------------------------------|
-| --image_path      | Ruta a la imagen que se desea aproximar (**obligatorio**)                 |
-| --num_triangles   | Cantidad de triángulos por individuo (por defecto: 200)                   |
-| --pop_size        | Tamaño de la población (por defecto: 30)                                  |
-| --num_generations | Número de generaciones a simular (por defecto: 300)                       |
-| --mutation_rate   | Probabilidad de mutación por triángulo (por defecto: 0.1)                 |
-| --elite_count     | Cantidad de individuos élite que se conservan por generación (default: 1) |
-| --selection       | Método de selección: elite, ruleta, torneo                                |
-| --crossover       | Método de cruce: one_point, two_points, uniform                           |
-| --mutation        | Tipo de mutación: simple, gene, multigen                                  |
-| --young_bias      | Si se incluye, activa un sesgo hacia individuos jóvenes en la evolución   |
-| --evaluate        | Funcíón para determinar fitness: evaluate, evaluate_only_mse              |
+El programa recibe un archivo de configuración en formato JSON, en el cual se pueden indicar los siguientes parametros:
 
----
+- image: ubicación de la imagen óbjetivo
+- triangle_count: cantidad de triángulos que las recreaciones deben tener
+- selection_method: método de selección de individuos
+- crossover_method: método de cruza de individuos
+- mutation_method: método de mutación de individuos
+- generation_method: método de conformación de generaciones
+- generation_size: cantidad de individuos por generación
+- selected_parents_size: cantidad de padres seleccionados para la cruza por generación
+- crossover_probability: probabilidad de cruza
+- mutation_probability: probabilidad de mutación
+- cut_conditions: especificaciones sobre la/las condiciones de corte a utilizar
 
-## Ejemplo completo
+  - time: máximo tiempo de ejecución
+  - generations: máximo número de generaciones
+  - acceptable_solution: valor objetivo de la función de fitness
+  - unchanging_individuals: un porcentaje de individuos se mantiene igual a lo largo de un número de generaciones
+        
+    - threshold: porcentaje minimo de similitud
+    - generations: cantidad de generaciones
+  - unchanging_max_fitness: cantidad de generaciones en la que se mantiene constante el máximo valor de fitness encontrado
 
-```bash
-uv run main.py \
-  --image_path ejemplos/wancho.jpeg \
-  --num_triangles 300 \
-  --pop_size 50 \
-  --num_generations 200 \
-  --mutation multigen \
-  --mutation_rate 0.2 \
-  --selection torneo \
-  --crossover two_points \
-  --young_bias
-```
----
+- positional_mutation_range: maxima variación de pixeles que puede tener un vertice de un triángulo al mutar
+- color_mutation_range: maxima variación del valor de color que puede tener un triángulo en una mutación
+- boltzmann_initial_temperature: valor inicial de la temperatura en el método Boltzmann
+- boltzmann_minimum_temperature: minimo valor que puede alcanzar la temperatura en el método Boltzmann
+- deterministic_tournament_participants: cantidad de participantes que conformen un torneo determinístico
+- probabilistic_tournament_threshold: threshold a usar en el método de torneo probabilístico
 
-## Salidas generadas
+## Métodos de selección
 
-- output_final.png: mejor individuo final generado.
-- gen_XXX.png: imagen del mejor individuo cada 5 generaciones.
-- evolucion_fitness.png: gráfico del error MSE a lo largo de las generaciones.
+Los posibles métodos de selección son los siguientes:
 
----
+- elite
+- roulette
+- universal
+- ranking
+- boltzmann
+- deterministic_tournament
+- probabilistic_tournament
 
-## Notas técnicas
+## Métodos de cruza
 
-- Los triángulos se generan con valores aleatorios de color y transparencia (canal alfa).
-- Se usa Image.alpha_composite() para respetar correctamente la superposición de triángulos translúcidos.
-- Para mejorar el rendimiento, los triángulos se agrupan en bloques de 10 antes de componer.
+- single_point
+- double_point
+- ring
+- uniform
 
----
+## Métodos de mutación
 
-## Autor
+- gen_mutation
+- multigen_mutation
+- uniform_mutation
+- complete_mutation
 
-Carlos  
-Trabajo práctico para la materia Sistemas de Inteligencia Artificial – ITBA
+## Métodos de conformación de generación
+
+- fill_all
+- fill_parent
+

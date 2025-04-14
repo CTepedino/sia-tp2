@@ -113,9 +113,8 @@ def genetic_algorithm(
         generation = generation_method(generation, children, selection_method)
         generation_number += 1
 
-        # # Print the best individual and their fitness in the current generation
-        # best_individual = max(generation, key=lambda ind: ind.get_fitness())
-        # print(f"Generation {generation_number}: Best Individual Fitness = {best_individual.get_fitness()}")
+        best_individual = max(generation, key=lambda ind: ind.get_fitness())
+        print(f"Generation {generation_number}: Best Individual Fitness = {best_individual.get_fitness()}")
 
         run_time = time.time() - start_time
 

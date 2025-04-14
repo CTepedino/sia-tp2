@@ -33,7 +33,7 @@ def mutate_triangle(individual: Individual, triangle: Triangle):
         else:
             c = tuple(point)
     else:
-        idx = random.randint(0, 2)
+        idx = random.randint(0, 3)
         old_val = color[idx]
         delta = random.randint(-color_mutation_range, color_mutation_range)
         color[idx] = min(max(0, old_val + delta), 255)

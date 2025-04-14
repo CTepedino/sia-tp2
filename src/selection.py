@@ -163,7 +163,7 @@ def deterministic_tournament(k: int, individuals: [Individual]):
 
 
 _threshold = 0.75
-def set_threshold(value):
+def set_probabilistic_tournament_threshold(value):
     global _threshold
     _threshold = value
 

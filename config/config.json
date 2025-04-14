@@ -6,10 +6,10 @@
   "mutation_method": "uniform_mutation",
   "generation_method": "fill_all",
   "cut_conditions": {
-    "generations": 3
+    "generations": 20
   },
-  "generation_size": 250,
-  "selected_parents_size": 125,
+  "generation_size": 20,
+  "selected_parents_size": 10,
   "crossover_probability": 0.9,
   "mutation_probability": 0.2
 }

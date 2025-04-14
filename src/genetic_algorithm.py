@@ -102,16 +102,19 @@ def genetic_algorithm(
         random.shuffle(selected_parents)
 
         children = []
-        for i in range(selected_parents_size):
+        i = 0
+        while len(children) < selected_parents_size:
+            i = (i+2) % selected_parents_size
             if random.random() < crossover_probability:
-                children.append(factory.create_individual(
-                    crossover_method(
-                        selected_parents[i],
-                        selected_parents[(i + 1) % selected_parents_size]
-                    )
-                ))
+                cross1, cross2 = crossover_method(
+                    selected_parents[i],
+                    selected_parents[(i + 1) % selected_parents_size]
+                )
+                children.append(factory.create_individual(cross1))
+                children.append(factory.create_individual(cross2))
             else:
                 children.append(selected_parents[i].copy())
+                children.append(selected_parents[(i + 1) % selected_parents_size].copy())
 
         for i in range(selected_parents_size):
             children[i] = factory.create_individual(mutation_method(children[i], mutation_probability))

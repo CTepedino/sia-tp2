@@ -6,7 +6,7 @@
   "mutation_method": "uniform_mutation",
   "generation_method": "fill_all",
   "cut_conditions": {
-    "generations": 100
+    "generations": 3
   },
   "generation_size": 250,
   "selected_parents_size": 125,

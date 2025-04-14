@@ -11,9 +11,8 @@ from genetic_algorithm import set_time_cut_condition, set_generations_cut_condit
     set_unchanging_max_fitness_cut_condition, genetic_algorithm
 from individual import IndividualFactory
 from fitness import get_fitness_fn
-from mutation import mutation_methods, set_positional_mutation_range, set_color_mutation_range
-from selection import selection_methods, set_initial_temperature, set_min_temperature, \
-    set_deterministic_tournament_participants, set_probabilistic_tournament_threshold
+from mutation import mutation_methods
+from selection import selection_methods, set_initial_temperature, set_min_temperature, set_deterministic_tournament_participants, set_probabilistic_tournament_threshold
 
 if __name__ == "__main__":
     with open(sys.argv[1], "r") as f:

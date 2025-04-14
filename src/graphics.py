@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 # Leer configuración
-with open("config_results.json", "r") as config_file:
+with open("../config/config_results.json", "r") as config_file:
     config = json.load(config_file)
 
 results_dir = config["results_dir"]
@@ -23,7 +23,7 @@ for archivo in archivos:
     try:
         inicio = archivo.index(letra_inicio) + 1
         fin = archivo.index(letra_fin, inicio)
-        etiqueta = archivo[inicio:fin]
+        etiqueta = archivo[inicio:fin-1]
     except ValueError:
         etiqueta = archivo  # fallback si no se encuentra
 
@@ -34,6 +34,7 @@ for archivo in archivos:
 plt.title("Evolución del Fitness según tipo de Cruza")
 plt.xlabel("Generación")
 plt.ylabel("Mejor Fitness")
+plt.ylim(0,1)
 plt.legend()
 plt.grid(True)
 plt.tight_layout()

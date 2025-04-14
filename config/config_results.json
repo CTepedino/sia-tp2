@@ -1,5 +1,5 @@
 {
-    "results_dir": "results/cruza",
+    "results_dir": "../results/cruza",
     "files": [
       "fitness_Selite_Cdouble_point_Mmultigen_mutation_Gfill_all.json",
       "fitness_Selite_Cring_Mmultigen_mutation_Gfill_all.json",

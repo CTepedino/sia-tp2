@@ -8,8 +8,8 @@
   "cut_conditions": {
     "generations": 400
   },
-  "generation_size": 100,
-  "selected_parents_size": 75,
+  "generation_size": 250,
+  "selected_parents_size": 125,
   "crossover_probability": 0.9,
-  "mutation_probability": 0.1
+  "mutation_probability": 0.2
 }

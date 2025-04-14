@@ -4,13 +4,13 @@ from individual import Individual, Triangle, random_triangle
 positional_mutation_range = 1000
 color_mutation_range = 255
 
-def set_positional_mutation_range(value):
-    global positional_mutation_range
-    positional_mutation_range = value
-
-def set_color_mutation_range(value):
-    global color_mutation_range
-    color_mutation_range = value
+# def set_positional_mutation_range(value):
+#     global positional_mutation_range
+#     positional_mutation_range = value
+#
+# def set_color_mutation_range(value):
+#     global color_mutation_range
+#     color_mutation_range = value
 
 
 def mutate_triangle(individual: Individual, triangle: Triangle):

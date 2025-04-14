@@ -63,8 +63,6 @@ El programa recibe un archivo de configuración en formato JSON, en el cual se p
     - generations: cantidad de generaciones
   - unchanging_max_fitness: cantidad de generaciones en la que se mantiene constante el máximo valor de fitness encontrado
 
-- positional_mutation_range: maxima variación de pixeles que puede tener un vertice de un triángulo al mutar
-- color_mutation_range: maxima variación del valor de color que puede tener un triángulo en una mutación
 - boltzmann_initial_temperature: valor inicial de la temperatura en el método Boltzmann
 - boltzmann_minimum_temperature: minimo valor que puede alcanzar la temperatura en el método Boltzmann
 - deterministic_tournament_participants: cantidad de participantes que conformen un torneo determinístico

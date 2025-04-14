@@ -1,17 +1,15 @@
 {
-  "image": "Flag_of_Argentina.png",
+  "image": "../Flag_of_Argentina.png",
   "triangle_count": "200",
-  "selection_method": "deterministic_tournament",
+  "selection_method": "universal",
   "crossover_method": "uniform",
   "mutation_method": "multigen_mutation",
-  "generation_method": "fill_parent",
+  "generation_method": "fill_all",
   "cut_conditions": {
-    "generations": 1000,
-    "acceptable_solution": 0.95
+    "generations": 70
   },
-  "generation_size": 250,
-  "selected_parents_size": 125,
+  "generation_size": 100,
+  "selected_parents_size": 50,
   "crossover_probability": 0.9,
-  "mutation_probability": 0.2,
-  "deterministic_tournament_participants": 10
+  "mutation_probability": 0.2
 }

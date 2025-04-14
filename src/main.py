@@ -4,15 +4,15 @@ import sys
 
 from PIL import Image
 
-from src.crossover import crossover_methods
-from src.generation import generation_methods
-from src.genetic_algorithm import set_time_cut_condition, set_generations_cut_condition, \
+from crossover import crossover_methods
+from generation import generation_methods
+from genetic_algorithm import set_time_cut_condition, set_generations_cut_condition, \
     set_acceptable_solution_cut_condition, set_unchanging_individuals_cut_condition, \
     set_unchanging_max_fitness_cut_condition, genetic_algorithm
-from src.individual import IndividualFactory
-from src.fitness import get_fitness_fn
-from src.mutation import mutation_methods, set_positional_mutation_range, set_color_mutation_range
-from src.selection import selection_methods, set_initial_temperature, set_min_temperature, \
+from individual import IndividualFactory
+from fitness import get_fitness_fn
+from mutation import mutation_methods
+from selection import selection_methods, set_initial_temperature, set_min_temperature, \
     set_deterministic_tournament_participants, set_probabilistic_tournament_threshold
 
 if __name__ == "__main__":
@@ -35,11 +35,6 @@ if __name__ == "__main__":
                                                  int(config["unchanging_individuals"]["generations"]))
     if "unchanging_max_fitness" in cut_conditions:
         set_unchanging_max_fitness_cut_condition(int(config["unchanging_max_fitness"]))
-
-    if "positional_mutation_range" in config:
-        set_positional_mutation_range(int(config["positional_mutation_range"]))
-    if "color_mutation_range" in config:
-        set_color_mutation_range(int(config["color_mutation_range"]))
 
     if "boltzmann_initial_temperature" in config:
         set_initial_temperature(float(config["boltzmann_initial_temperature"]))

@@ -1,7 +1,7 @@
 {
   "image": "Flag_of_Argentina.png",
   "triangle_count": "200",
-  "selection_method": "boltzmann",
+  "selection_method": "probabilistic_tournament",
   "crossover_method": "uniform",
   "mutation_method": "multigen_mutation",
   "generation_method": "fill_all",
@@ -12,6 +12,5 @@
   "selected_parents_size": 50,
   "crossover_probability": 0.9,
   "mutation_probability": 0.2,
-  "boltzmann_initial_temperature": 0.5,
-  "boltzmann_minimum_temperature": 0.1
+  "probabilistic_tournament_threshold": 0.5
 }

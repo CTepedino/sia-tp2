@@ -1,5 +1,5 @@
 {
-  "image": "../Flag_of_Argentina.png",
+  "image": "Flag_of_Argentina.png",
   "triangle_count": "200",
   "selection_method": "probabilistic_tournament",
   "crossover_method": "uniform",

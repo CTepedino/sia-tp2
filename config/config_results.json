@@ -1,13 +1,12 @@
 {
-    "results_dir": "../results/cruza",
+    "results_dir": "../results/conformacion",
     "files": [
-      "fitness_Selite_Cdouble_point_Mmultigen_mutation_Gfill_all.json",
-      "fitness_Selite_Cring_Mmultigen_mutation_Gfill_all.json",
-      "fitness_Selite_Csingle_point_Mmultigen_mutation_Gfill_all.json",
-      "fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_all.json"
+        "fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_all.json",
+        "fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_parent.json"
     ],
-    "output_filename": "grafico_fitness_cruza",
-    "tag_start": "C",
-    "tag_end": "M"
+    "output_filename": "grafico_fitness_conformacion_genetica",
+    "tag_start": "G",
+    "tag_end": ".",
+    "zoom": false
   }
   

@@ -1,14 +1,10 @@
 {
     "dirs": [
-        "../results/gen_size_25",
-        "../results/gen_size_50",
-        "../results/gen_size_75",
-        "../results/gen_size_100",
-        "../results/gen_size_150",
-        "../results/gen_size_200"
+        "../results/mut_prob_0_1",
+        "../results/mut_prob_0_5"
     ],
-    "filename":"fitness_Suniversal_Cuniform_Mmultigen_mutation_Gfill_all.json",
-    "output_filename": "grafico_fitness_segun_gen_size",
-    "zoom": true
+    "filename":"fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_all.json",
+    "output_filename": "grafico_fitness_segun_mut_prob",
+    "zoom": false
   }
   

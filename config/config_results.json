@@ -1,12 +1,14 @@
 {
-    "results_dir": "../results/conformacion",
+    "results_dir": "../results/seleccion",
     "files": [
         "fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_all.json",
-        "fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_parent.json"
+        "fitness_Sranking_Cuniform_Mmultigen_mutation_Gfill_all.json",
+        "fitness_Sroulette_Cuniform_Mmultigen_mutation_Gfill_all.json",
+        "fitness_Suniversal_Cuniform_Mmultigen_mutation_Gfill_all.json"
     ],
-    "output_filename": "grafico_fitness_conformacion_genetica",
-    "tag_start": "G",
-    "tag_end": ".",
-    "zoom": false
+    "output_filename": "grafico_fitness_seleccion",
+    "tag_start": "S",
+    "tag_end": "C",
+    "zoom": true
   }
   

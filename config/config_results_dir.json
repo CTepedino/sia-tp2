@@ -1,0 +1,11 @@
+{
+    "dirs": [
+        "../results/probabilstic_tournament_0_5",
+        "../results/probabilstic_tournament-0_75",
+        "../results/probabilstic_tournament_0_9"
+    ],
+    "filename":"fitness_Sprobabilistic_tournament_Cuniform_Mmultigen_mutation_Gfill_all.json",
+    "output_filename": "grafico_fitness_probabilistic_tournament",
+    "zoom": false
+  }
+  

@@ -1,7 +1,10 @@
 {
     "dirs": [
         "../results/mut_prob_0_1",
-        "../results/mut_prob_0_5"
+        "../results/mut_prob_0_25",
+        "../results/mut_prob_0_5",
+        "../results/mut_prob_0_75",
+        "../results/mut_prob_1"
     ],
     "filename":"fitness_Selite_Cuniform_Mmultigen_mutation_Gfill_all.json",
     "output_filename": "grafico_fitness_segun_mut_prob",

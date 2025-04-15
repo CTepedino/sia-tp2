@@ -72,7 +72,7 @@ if __name__ == "__main__":
     output_image.save(output_path)
     print(f"Fitness = {best_individual.get_fitness()}")
 
-    with open("triangles.txt", "r") as f:
+    with open("triangles.txt", "w") as f:
         f.write(f"{best_individual}")
 
 
